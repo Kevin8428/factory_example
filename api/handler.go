@@ -13,27 +13,31 @@ func (a *API) InitializeHandler(server *http.ServeMux) {
 
 func (a *API) Handle() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("request received")
 		// localhost:8080/?entity=Cities&max_count=3&filter=international%3D0
-		t := r.FormValue("entity")
 		// mc := r.FormValue("max_count")
+
+		e := r.FormValue("entity")
 		f := url.QueryEscape(r.FormValue("filter"))
-		fmt.Println("form values: ", t)
-		values, err := a.transformer.Get(t)
+
+		results, err := a.transformer.Get(e)
+		if err != nil {
+			w.Write([]byte(err.Error()))
+			return
+		}
+		shouldFilter, err := a.transformer.ShouldFilter(e, f)
+		fmt.Println("shouldFilter: ", shouldFilter)
 		if err != nil {
 			w.Write([]byte(err.Error()))
 			return
 		}
 
-		shouldFilter := a.transformer.ShouldFilter(t)
-
 		if shouldFilter {
-			v, err := a.transformer.Filter(values, f)
+			v, err := a.transformer.Filter(results, f)
 			if err == nil {
-				values = v
+				results = v
 			}
 		}
-		jData, err := json.Marshal(values)
+		jData, err := json.Marshal(results)
 		if err != nil {
 			fmt.Println("error marshalling data ", err)
 		}

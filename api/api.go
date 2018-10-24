@@ -10,9 +10,9 @@ func New() *API {
 	return &API{
 		transformer: &transform.TransformerByEntity{
 			Transformer: map[string]transform.Transformer{
-				"Animals": &transform.AnimalsTransform{},
-				"People":  &transform.PeopleTransform{},
-				"Cities":  &transform.CitiesTransform{},
+				"animals": &transform.AnimalsTransform{},
+				"people":  &transform.PeopleTransform{},
+				"cities":  &transform.CitiesTransform{},
 			},
 		},
 	}

@@ -2,7 +2,8 @@ package transform
 
 import (
 	"errors"
-	"fmt"
+
+	"github.com/kevin8428/factory_example/model"
 )
 
 type TransformerByEntity struct {
@@ -10,34 +11,33 @@ type TransformerByEntity struct {
 }
 
 type Transformer interface {
-	Get(s string) ([]string, error)
-	Filter(s []string, f string) ([]string, error)
+	Get(s string) ([]model.Result, error)
+	Filter(s []model.Result, f string) ([]model.Result, error)
 	Append(s string) error
-	ShouldFilter(s string) bool
+	ShouldFilter(entity, filter string) (bool, error)
 }
 
-func (t *TransformerByEntity) Get(s string) ([]string, error) {
+func (t *TransformerByEntity) Get(s string) ([]model.Result, error) {
 	transformer, ok := t.Transformer[s]
 
 	if !ok {
-		fmt.Println("no transform entity exists for ", s)
-		return nil, errors.New("no transform entity exists")
+		return nil, errors.New("no transform entity exists for entity: " + s)
 	}
 	return transformer.Get(s)
 }
 
-func (t *TransformerByEntity) Filter(s []string, f string) ([]string, error) {
-	return []string{}, nil
+func (t *TransformerByEntity) Filter(s []model.Result, f string) ([]model.Result, error) {
+	return []model.Result{}, nil
 }
 
 func (t *TransformerByEntity) Append(s string) error {
 	return nil
 }
 
-func (t *TransformerByEntity) ShouldFilter(s string) bool {
-	transformer, ok := t.Transformer[s]
+func (t *TransformerByEntity) ShouldFilter(entity, filter string) (bool, error) {
+	transformer, ok := t.Transformer[entity]
 	if !ok {
-		fmt.Println("no transform entity exists for ", s)
+		return false, errors.New("no transform entity exists")
 	}
-	return transformer.ShouldFilter(s)
+	return transformer.ShouldFilter(entity, filter)
 }
