@@ -13,7 +13,7 @@ func (a *API) InitializeHandler(server *http.ServeMux) {
 
 func (a *API) Handle() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// localhost:8080/?entity=Cities&max_count=3&filter=international%3D0
+		// localhost:8080/?entity=cities&max_count=3&filter=isInternational
 		// mc := r.FormValue("max_count")
 
 		e := r.FormValue("entity")
@@ -32,7 +32,8 @@ func (a *API) Handle() http.HandlerFunc {
 		}
 
 		if shouldFilter {
-			v, err := a.transformer.Filter(results, f)
+			fmt.Println("running filter")
+			v, err := a.transformer.Filter(e, results, f)
 			if err == nil {
 				results = v
 			}

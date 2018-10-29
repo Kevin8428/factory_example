@@ -30,7 +30,7 @@ func (t *PeopleTransform) Get(s string) ([]model.Result, error) {
 	}, nil
 }
 
-func (t *PeopleTransform) Filter(s []model.Result, f string) ([]model.Result, error) {
+func (t *PeopleTransform) Filter(s string, r []model.Result, f string) ([]model.Result, error) {
 	return []model.Result{}, nil
 }
 func (t *PeopleTransform) Append(s string) error {

@@ -12,7 +12,7 @@ type TransformerByEntity struct {
 
 type Transformer interface {
 	Get(s string) ([]model.Result, error)
-	Filter(s []model.Result, f string) ([]model.Result, error)
+	Filter(s string, r []model.Result, f string) ([]model.Result, error)
 	Append(s string) error
 	ShouldFilter(entity, filter string) (bool, error)
 }
@@ -26,8 +26,13 @@ func (t *TransformerByEntity) Get(s string) ([]model.Result, error) {
 	return transformer.Get(s)
 }
 
-func (t *TransformerByEntity) Filter(s []model.Result, f string) ([]model.Result, error) {
-	return []model.Result{}, nil
+func (t *TransformerByEntity) Filter(s string, r []model.Result, f string) ([]model.Result, error) {
+	transformer, ok := t.Transformer[s]
+
+	if !ok {
+		return nil, errors.New("no transform entity exists for entity: " + s)
+	}
+	return transformer.Filter(s, r, f)
 }
 
 func (t *TransformerByEntity) Append(s string) error {

@@ -33,7 +33,7 @@ func (t *AnimalsTransform) Get(s string) ([]model.Result, error) {
 	}, nil
 }
 
-func (t *AnimalsTransform) Filter(s []model.Result, f string) ([]model.Result, error) {
+func (t *AnimalsTransform) Filter(s string, r []model.Result, f string) ([]model.Result, error) {
 	return []model.Result{}, nil
 }
 func (t *AnimalsTransform) Append(s string) error {
