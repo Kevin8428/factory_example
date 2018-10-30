@@ -1,27 +1,39 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/kevin8428/factory_example/api"
 )
 
 func main() {
 	config := api.Config{
-		Env:  "dev",
-		Port: "8001",
+		Env:  setConfigVar("ENV", "dev"),
+		Port: setConfigVar("PORT", "8001"),
+		Mode: setConfigVar("MODE", "factory"),
 	}
-	// fmt.Println("listening on server ", config.Port)
 
 	api := api.New()
 	server := http.NewServeMux()
-	api.InitializeHandler(server)
-	err := http.ListenAndServe(":"+config.Port, server)
-	fmt.Println("listening on server ", config.Port)
-	if err != nil {
-		fmt.Println("error starting server: ", err)
-	} else {
-		fmt.Println("listening on server ")
+	switch config.Mode {
+	case "factory":
+		api.RegisterHandlers(server)
+		api.InitializeHandlerFactory(server)
+	default:
+		api.InitializeHandler(server)
 	}
+
+	panic(http.ListenAndServe(":"+config.Port, server))
 }
+
+func setConfigVar(key, fallback string) string {
+	val := os.Getenv(key)
+	if len(val) == 0 {
+		return fallback
+	}
+	return val
+}
+
+// 1. look at greg's PR for passing functions as struct values
+// 2. look at thomas' search-service for passing functions around

@@ -8,10 +8,14 @@ import (
 )
 
 func (a *API) InitializeHandler(server *http.ServeMux) {
-	server.Handle("/", a.Handle())
+	server.Handle("/", a.Handler())
 }
 
-func (a *API) Handle() http.HandlerFunc {
+func (a *API) InitializeHandlerFactory(server *http.ServeMux) {
+	server.Handle("/", a.HandlerFactory())
+}
+
+func (a *API) Handler() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// localhost:8080/?entity=cities&max_count=3&filter=isInternational
 		// mc := r.FormValue("max_count")
@@ -25,14 +29,12 @@ func (a *API) Handle() http.HandlerFunc {
 			return
 		}
 		shouldFilter, err := a.transformer.ShouldFilter(e, f)
-		fmt.Println("shouldFilter: ", shouldFilter)
 		if err != nil {
 			w.Write([]byte(err.Error()))
 			return
 		}
 
 		if shouldFilter {
-			fmt.Println("running filter")
 			v, err := a.transformer.Filter(e, results, f)
 			if err == nil {
 				results = v
@@ -44,5 +46,15 @@ func (a *API) Handle() http.HandlerFunc {
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(jData)
+	})
+}
+
+func (a *API) HandlerFactory() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		e := r.FormValue("entity")
+		handler := a.Handlers[e]
+		if handler != nil {
+			handler.Process(w, r)
+		}
 	})
 }
